@@ -1,0 +1,5 @@
+<%= form_for @conn, Routes.chat_path(@conn, :chat), fn f -> %>
+
+ Name <%= text_input f, :name %>
+  <%= submit "Chat" %>
+<% end %>

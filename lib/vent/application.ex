@@ -16,6 +16,7 @@ defmodule Vent.Application do
       Vent.ChatPresence,
       # Start the Endpoint (http/https)
       VentWeb.Endpoint,
+      VentWeb.ChatTracker,
       Vent.ChatSupervisor
       # Start a worker by calling: Vent.Worker.start_link(arg)
       # {Vent.Worker, arg}

@@ -9,15 +9,16 @@ defmodule Vent.ChatServer do
   end
 
   def init(state) do
-    IO.puts("CHAT SERVER STARTED")
-    # start ETS
     :ets.new(:chat_table, [:set, :protected, :named_table])
 
     {:ok, state}
   end
 
+  def left_room(room_id) do
+    GenServer.call(@name, {:left_room, room_id})
+  end
+
   def check_rooms() do
-    IO.puts("_________in check rooms func")
     GenServer.call(@name, :check_table)
   end
 
@@ -25,8 +26,29 @@ defmodule Vent.ChatServer do
     GenServer.cast(@name, {:new_room, room_id})
   end
 
+  def handle_call({:left_room, room_id}, _from, state) do
+    IO.puts("IN LEFT ROOM HANDLE CALL")
+    # query room by id get count & room_id
+    fun =
+      fun do
+        {room_id, count} when room_id == room_id -> {room_id, count}
+      end
+
+    [{room_id, count}] = :ets.select(:chat_table, fun)
+
+    case count - 1 do
+      1 -> :ets.insert(:chat_table, {room_id, 1})
+      0 -> :ets.delete(:chat_table, room_id)
+    end
+
+    {:noreply, state}
+
+    # subtract 1 from count.
+    # if count now 1, insert room with new count
+    # if count 0, delete row from ets
+  end
+
   def handle_call(:check_table, _from, state) do
-    IO.puts("_________Handle call check_table")
     # query ETS for any open rooms
     fun =
       fun do

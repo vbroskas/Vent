@@ -1,5 +1,6 @@
 defmodule VentWeb.ChatTracker do
   @behaviour Phoenix.Tracker
+  alias Vent.ChatServer
 
   require Logger
 
@@ -42,9 +43,16 @@ defmodule VentWeb.ChatTracker do
 
   def handle_diff(diff, state) do
     for {topic, {joins, leaves}} <- diff do
-      Logger.info(inspect(topic))
-      Logger.info(inspect(joins))
-      Logger.info(inspect(leaves))
+      # Logger.info(inspect(topic))
+      # Logger.info(inspect(joins))
+      # Logger.info(inspect(leaves))
+
+      if leaves != [] do
+        <<"chat:", rest::binary>> = topic
+        IO.puts("TOPPPPPIC ISSS: #{rest}")
+        ChatServer.left_room(rest)
+      end
+
       # result = list(topic)
       # for {key, meta} <- joins do
       #   IO.puts("#{topic}~~presence join: key \"#{key}\" with meta #{inspect(meta)}")

@@ -26,22 +26,32 @@ defmodule Vent.ChatServer do
     GenServer.cast(@name, {:new_room, room_id})
   end
 
-  def handle_call({:left_room, room_id}, _from, state) do
+  def handle_call({:left_room, id}, _from, state) do
     IO.puts("IN LEFT ROOM HANDLE CALL")
+    IO.puts(id)
     # query room by id get count & room_id
-    fun =
+    func =
       fun do
-        {room_id, count} when room_id == room_id -> {room_id, count}
+        {room_id, count} when room_id == ^id -> {room_id, count}
       end
 
-    [{room_id, count}] = :ets.select(:chat_table, fun)
+    result = :ets.select(:chat_table, func)
+    IO.inspect(result)
+
+    [{room_id, count}] = :ets.select(:chat_table, func)
 
     case count - 1 do
-      1 -> :ets.insert(:chat_table, {room_id, 1})
-      0 -> :ets.delete(:chat_table, room_id)
+      1 ->
+        IO.puts("down to 1")
+        :ets.insert(:chat_table, {room_id, 1})
+
+      0 ->
+        IO.puts("TOPIC DELETED")
+        :ets.delete(:chat_table, room_id)
     end
 
-    {:noreply, state}
+    IO.puts("FINISHING UP+++++")
+    {:reply, :ok, state}
 
     # subtract 1 from count.
     # if count now 1, insert room with new count

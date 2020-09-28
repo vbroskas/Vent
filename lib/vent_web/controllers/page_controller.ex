@@ -7,7 +7,11 @@ defmodule VentWeb.PageController do
   end
 
   def chat(conn, params) do
-    # check ETS for any open rooms
+    IO.puts("++++++++++++++++++++++++++++++++")
+    IO.inspect(params)
+    # if a vent, check for vent opening
+    # if a listen, check for listen opening
+
     room_id =
       case ChatServer.check_rooms() do
         [] -> create_room_id(10)
@@ -30,6 +34,7 @@ defmodule VentWeb.PageController do
 
   defp create_room_id(length) do
     room_id = :crypto.strong_rand_bytes(length) |> Base.encode64() |> binary_part(0, length)
+    # TODO, need to add room with either listen or vent set to 1
     ChatServer.add_room(room_id)
     room_id
   end

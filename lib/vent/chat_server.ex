@@ -51,6 +51,8 @@ defmodule Vent.ChatServer do
     {:reply, :ok, state}
   end
 
+  # TODO, make two versions of this function to check for
+  # vent opening and listen opening
   def handle_call(:check_table, _from, state) do
     # query ETS for any open rooms
     fun =
@@ -79,6 +81,8 @@ defmodule Vent.ChatServer do
     DateTime.to_unix(DateTime.utc_now())
   end
 
+  # TODO need to create :new_room_vent and :new_room_listen to start rooms
+  # with either vent or listen set to 1
   def handle_cast({:new_room, room_id}, state) do
     :ets.insert(:chat_table, {room_id, 1, create_timestamp()})
     {:noreply, state}

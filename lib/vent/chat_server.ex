@@ -32,18 +32,15 @@ defmodule Vent.ChatServer do
     # query room by id get count & room_id
     func =
       fun do
-        {room_id, count} when room_id == ^id -> {room_id, count}
+        {room_id, count, time} when room_id == ^id -> {room_id, count}
       end
-
-    result = :ets.select(:chat_table, func)
-    IO.inspect(result)
 
     [{room_id, count}] = :ets.select(:chat_table, func)
 
     case count - 1 do
       1 ->
         IO.puts("down to 1")
-        :ets.insert(:chat_table, {room_id, 1})
+        :ets.insert(:chat_table, {room_id, 1, create_timestamp()})
 
       0 ->
         IO.puts("TOPIC DELETED")
@@ -52,39 +49,38 @@ defmodule Vent.ChatServer do
 
     IO.puts("FINISHING UP+++++")
     {:reply, :ok, state}
-
-    # subtract 1 from count.
-    # if count now 1, insert room with new count
-    # if count 0, delete row from ets
   end
 
   def handle_call(:check_table, _from, state) do
     # query ETS for any open rooms
     fun =
       fun do
-        {room_id, count} when count < 2 -> room_id
+        {room_id, count, time} when count < 2 -> {room_id, time}
       end
 
     result =
       case :ets.select(:chat_table, fun) do
-        # grab first empty room
-        result when result != [] ->
-          room_id = List.first(result)
-          :ets.insert(:chat_table, {room_id, 2})
-          room_id
-
         # no empty rooms found
         [] ->
           []
+
+        # get room that's been empty the longest
+        result when result != [] ->
+          {room_id, _} = Enum.min_by(result, fn {_k, v} -> v end)
+          # get open room that has been waiting the longest
+          :ets.insert(:chat_table, {room_id, 2, create_timestamp()})
+          room_id
       end
 
-    # if open room found increase count for that room, and return room_id to controller
-    # if no room found, return [] to controller
     {:reply, result, state}
   end
 
+  def create_timestamp() do
+    DateTime.to_unix(DateTime.utc_now())
+  end
+
   def handle_cast({:new_room, room_id}, state) do
-    :ets.insert(:chat_table, {room_id, 1})
+    :ets.insert(:chat_table, {room_id, 1, create_timestamp()})
     {:noreply, state}
   end
 end

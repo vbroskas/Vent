@@ -47,9 +47,9 @@ defmodule VentWeb.ChatTracker do
       # Logger.info(inspect(joins))
       # Logger.info(inspect(leaves))
 
+      # user left a topic, make call to chat server
       if leaves != [] do
         <<"chat:", rest::binary>> = topic
-        IO.puts("TOPPPPPIC ISSS: #{rest}")
         ChatServer.left_room(rest)
       end
 
@@ -86,5 +86,9 @@ defmodule VentWeb.ChatTracker do
 
   def list(topic) do
     Phoenix.Tracker.list(__MODULE__, topic)
+  end
+
+  def get_all_rows() do
+    :ets.tab2list(:chat_table)
   end
 end

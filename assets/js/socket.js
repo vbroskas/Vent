@@ -8,7 +8,7 @@
 // from the params if you are not using authentication.
 import { Socket } from "phoenix"
 
-const chatSocket = new Socket("/chat_socket", { params: { token: window.userToken, user_id: window.user_id, username: window.username } })
+const chatSocket = new Socket("/chat_socket", { params: { token: window.userToken, user_id: window.user_id, username: window.username, role: window.role } })
 
 chatSocket.onOpen(() => console.log('chatSocket connected'))
 if (window.userToken) {

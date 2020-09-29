@@ -14,50 +14,77 @@ defmodule Vent.ChatServer do
     {:ok, state}
   end
 
-  def left_room(room_id) do
-    GenServer.call(@name, {:left_room, room_id})
+  def left_room(room_id, role) do
+    GenServer.call(@name, {:left_room, room_id, role})
   end
 
-  def check_rooms() do
-    GenServer.call(@name, :check_table)
+  def check_vent_openings() do
+    GenServer.call(@name, :check_vent_openings)
   end
 
-  def add_room(room_id) do
-    GenServer.cast(@name, {:new_room, room_id})
+  def check_listen_openings() do
+    GenServer.call(@name, :check_listen_openings)
   end
 
-  def handle_call({:left_room, id}, _from, state) do
-    IO.puts("IN LEFT ROOM HANDLE CALL")
+  def create_room_for_vent(room_id) do
+    GenServer.cast(@name, {:create_room_for_vent, room_id})
+  end
+
+  def create_room_for_listen(room_id) do
+    GenServer.cast(@name, {:create_room_for_listen, room_id})
+  end
+
+  @doc """
+  when listen user leaves a subtopic, pattern match on their role.
+  """
+  def handle_call({:left_room, id, _role = "listen"}, _from, state) do
+    IO.puts("LISTEN LEFT ROOOOM")
     IO.puts(id)
     # query room by id get count & room_id
-    func =
-      fun do
-        {room_id, count, time} when room_id == ^id -> {room_id, count}
-      end
+    [{room_id, vent, _listen}] = left_room_query(id)
 
-    [{room_id, count}] = :ets.select(:chat_table, func)
+    cond do
+      vent == 1 ->
+        IO.puts("Vent remaining")
+        :ets.insert(:chat_table, {room_id, vent, 0, create_timestamp()})
 
-    case count - 1 do
-      1 ->
-        IO.puts("down to 1")
-        :ets.insert(:chat_table, {room_id, 1, create_timestamp()})
-
-      0 ->
+      vent == 0 ->
         IO.puts("TOPIC DELETED")
         :ets.delete(:chat_table, room_id)
     end
 
-    IO.puts("FINISHING UP+++++")
     {:reply, :ok, state}
   end
 
-  # TODO, make two versions of this function to check for
-  # vent opening and listen opening
-  def handle_call(:check_table, _from, state) do
-    # query ETS for any open rooms
+  @doc """
+  when vent user leaves a subtopic, pattern match on their role.
+  """
+  def handle_call({:left_room, id, _role = "vent"}, _from, state) do
+    IO.puts("VENT LEFT ROOM")
+    IO.puts(id)
+    # query room by id get count & room_id
+    [{room_id, _vent, listen}] = left_room_query(id)
+
+    cond do
+      listen == 1 ->
+        IO.puts("Listener remaining")
+        :ets.insert(:chat_table, {room_id, 0, listen, create_timestamp()})
+
+      listen == 0 ->
+        IO.puts("TOPIC DELETED")
+        :ets.delete(:chat_table, room_id)
+    end
+
+    {:reply, :ok, state}
+  end
+
+  @doc """
+  Find rooms with vent openings
+  """
+  def handle_call(:check_vent_openings, _from, state) do
     fun =
       fun do
-        {room_id, count, time} when count < 2 -> {room_id, time}
+        {room_id, vent, listen, time} when vent == 0 -> {room_id, vent, listen, time}
       end
 
     result =
@@ -68,9 +95,35 @@ defmodule Vent.ChatServer do
 
         # get room that's been empty the longest
         result when result != [] ->
-          {room_id, _} = Enum.min_by(result, fn {_k, v} -> v end)
+          {room_id, _vent, listen, _time} = Enum.min_by(result, fn {_id, _v, _l, t} -> t end)
           # get open room that has been waiting the longest
-          :ets.insert(:chat_table, {room_id, 2, create_timestamp()})
+          :ets.insert(:chat_table, {room_id, 1, listen, create_timestamp()})
+          room_id
+      end
+
+    {:reply, result, state}
+  end
+
+  @doc """
+  Find rooms with listen openings
+  """
+  def handle_call(:check_listen_openings, _from, state) do
+    fun =
+      fun do
+        {room_id, vent, listen, time} when listen == 0 -> {room_id, vent, listen, time}
+      end
+
+    result =
+      case :ets.select(:chat_table, fun) do
+        # no empty rooms found
+        [] ->
+          []
+
+        # get room that's been empty the longest
+        result when result != [] ->
+          {room_id, vent, _listen, _time} = Enum.min_by(result, fn {_id, _v, _l, t} -> t end)
+          # get open room that has been waiting the longest
+          :ets.insert(:chat_table, {room_id, vent, 1, create_timestamp()})
           room_id
       end
 
@@ -81,10 +134,33 @@ defmodule Vent.ChatServer do
     DateTime.to_unix(DateTime.utc_now())
   end
 
-  # TODO need to create :new_room_vent and :new_room_listen to start rooms
-  # with either vent or listen set to 1
-  def handle_cast({:new_room, room_id}, state) do
-    :ets.insert(:chat_table, {room_id, 1, create_timestamp()})
+  @doc """
+  ets row pattern is {room_id, vent_number, listen_number, timestamp}
+  create new room with just a vent subscribed
+  """
+  def handle_cast({:create_room_for_vent, room_id}, state) do
+    :ets.insert(:chat_table, {room_id, 1, 0, create_timestamp()})
     {:noreply, state}
+  end
+
+  @doc """
+  ets row pattern is {room_id, vent_number, listen_number, timestamp}
+  create new room with just a listener subscribed
+  """
+  def handle_cast({:create_room_for_listen, room_id}, state) do
+    :ets.insert(:chat_table, {room_id, 0, 1, create_timestamp()})
+    {:noreply, state}
+  end
+
+  @doc """
+  ets query for when client leaves a subtopic. find the room they left by room_id
+  """
+  defp left_room_query(id) do
+    func =
+      fun do
+        {room_id, vent, listen, time} when room_id == ^id -> {room_id, vent, listen}
+      end
+
+    :ets.select(:chat_table, func)
   end
 end

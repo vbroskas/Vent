@@ -23,13 +23,16 @@ defmodule VentWeb.ChatSocket do
   #   {:ok, socket}
   # end
 
-  def connect(%{"token" => token, "username" => username}, socket) do
+  def connect(%{"token" => token, "username" => username, "role" => role}, socket) do
+    IO.puts("IN CONNNNNECT SOCKET")
+
     case verify(socket, token) do
       {:ok, user_id} ->
         socket =
           socket
           |> assign(:user_id, user_id)
           |> assign(:username, username)
+          |> assign(:role, role)
 
         {:ok, socket}
 

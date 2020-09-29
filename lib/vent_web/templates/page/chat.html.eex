@@ -5,6 +5,7 @@ window.userToken = "<%= assigns[:auth_token] %>";
 window.roomId = "<%= assigns[:room_id] %>";
 window.userId = "<%= assigns[:user_id] %>";
 window.username = "<%= assigns[:username] %>";
+window.role = "<%= assigns[:role] %>";
 </script>
 
 <h1>CHAT PAGE</h1>
@@ -12,3 +13,4 @@ window.username = "<%= assigns[:username] %>";
 <h1>room id: <%=@conn.assigns.room_id %></h1>
 <h1>auth token: <%=@conn.assigns.auth_token %></h1>
 <h1>username: <%=@conn.assigns.username %></h1>
+<h1>role: <%=@conn.assigns.role %></h1>

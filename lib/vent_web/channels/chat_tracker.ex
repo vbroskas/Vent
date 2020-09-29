@@ -42,15 +42,17 @@ defmodule VentWeb.ChatTracker do
   """
 
   def handle_diff(diff, state) do
-    for {topic, {joins, leaves}} <- diff do
+    for {topic, {_joins, leaves}} <- diff do
       # Logger.info(inspect(topic))
       # Logger.info(inspect(joins))
       # Logger.info(inspect(leaves))
+      <<"chat:", sub_topic::binary>> = topic
 
-      # user left a topic, make call to chat server
-      if leaves != [] do
-        <<"chat:", rest::binary>> = topic
-        ChatServer.left_room(rest)
+      for {key, meta} when leaves != [] <- leaves do
+        IO.puts("#{sub_topic}~~role: #{meta.role} user: #{key}")
+        ChatServer.left_room(sub_topic, meta.role)
+        # msg = {:leave, key, meta}
+        # Phoenix.PubSub.direct_broadcast!(state.node_name, state.pubsub_server, topic, msg)
       end
 
       # result = list(topic)
@@ -75,10 +77,11 @@ defmodule VentWeb.ChatTracker do
   a pid and track it for a given topic. Any metadata can be provided here, which
   is useful for knowing who is connected and when they joined.
   """
-  def track(%{channel_pid: pid, topic: topic, assigns: %{user_id: user_id}}) do
+  def track(%{channel_pid: pid, topic: topic, assigns: %{user_id: user_id, role: role}}) do
     metadata = %{
       online_at: DateTime.utc_now(),
-      user_id: user_id
+      user_id: user_id,
+      role: role
     }
 
     Phoenix.Tracker.track(__MODULE__, pid, topic, user_id, metadata)

@@ -17,8 +17,8 @@ defmodule VentWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    post "/chat", PageController, :chat, as: :chat
-    get "/chat", PageController, :start_chat, as: :chat
+    post "/chat", PageController, :chat
+    get "/chat", PageController, :chat
   end
 
   # Other scopes may use custom stacks.

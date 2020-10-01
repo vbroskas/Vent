@@ -82,21 +82,15 @@ defmodule Vent.ChatServer do
   Find rooms with vent openings
   """
   def handle_call(:check_vent_openings, _from, state) do
-    fun =
-      fun do
-        {room_id, vent, listen, time} when vent == 0 -> {room_id, vent, listen, time}
-      end
-
     result =
-      case :ets.select(:chat_table, fun) do
+      case query_vent_openings() do
         # no empty rooms found
         [] ->
           []
 
-        # get room that's been empty the longest
-        result when result != [] ->
-          {room_id, _vent, listen, _time} = Enum.min_by(result, fn {_id, _v, _l, t} -> t end)
+        result ->
           # get open room that has been waiting the longest
+          {room_id, _vent, listen, _time} = Enum.min_by(result, fn {_id, _v, _l, t} -> t end)
           :ets.insert(:chat_table, {room_id, 1, listen, create_timestamp()})
           room_id
       end
@@ -106,23 +100,19 @@ defmodule Vent.ChatServer do
 
   @doc """
   Find rooms with listen openings
+  ets row pattern is {room_id, vent_number, listen_number, timestamp}
   """
   def handle_call(:check_listen_openings, _from, state) do
-    fun =
-      fun do
-        {room_id, vent, listen, time} when listen == 0 -> {room_id, vent, listen, time}
-      end
-
     result =
-      case :ets.select(:chat_table, fun) do
+      case query_listen_openings() do
         # no empty rooms found
         [] ->
           []
 
-        # get room that's been empty the longest
-        result when result != [] ->
-          {room_id, vent, _listen, _time} = Enum.min_by(result, fn {_id, _v, _l, t} -> t end)
+        result ->
           # get open room that has been waiting the longest
+          {room_id, vent, _listen, _time} = Enum.min_by(result, fn {_id, _v, _l, t} -> t end)
+          # update record for that room with new listener
           :ets.insert(:chat_table, {room_id, vent, 1, create_timestamp()})
           room_id
       end
@@ -150,6 +140,24 @@ defmodule Vent.ChatServer do
   def handle_cast({:create_room_for_listen, room_id}, state) do
     :ets.insert(:chat_table, {room_id, 0, 1, create_timestamp()})
     {:noreply, state}
+  end
+
+  defp query_vent_openings() do
+    fun =
+      fun do
+        {room_id, vent, listen, time} when vent == 0 -> {room_id, vent, listen, time}
+      end
+
+    :ets.select(:chat_table, fun)
+  end
+
+  defp query_listen_openings() do
+    fun =
+      fun do
+        {room_id, vent, listen, time} when listen == 0 -> {room_id, vent, listen, time}
+      end
+
+    :ets.select(:chat_table, fun)
   end
 
   @doc """

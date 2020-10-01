@@ -42,31 +42,24 @@ defmodule VentWeb.ChatTracker do
   """
 
   def handle_diff(diff, state) do
-    for {topic, {_joins, leaves}} <- diff do
+    for {topic, {joins, leaves}} <- diff do
       # Logger.info(inspect(topic))
       # Logger.info(inspect(joins))
       # Logger.info(inspect(leaves))
       <<"chat:", sub_topic::binary>> = topic
 
-      for {key, meta} when leaves != [] <- leaves do
+      for {key, meta} <- leaves do
         IO.puts("#{sub_topic}~~role: #{meta.role} user: #{key}")
         ChatServer.left_room(sub_topic, meta.role)
         # msg = {:leave, key, meta}
         # Phoenix.PubSub.direct_broadcast!(state.node_name, state.pubsub_server, topic, msg)
       end
 
-      # result = list(topic)
-      # for {key, meta} <- joins do
-      #   IO.puts("#{topic}~~presence join: key \"#{key}\" with meta #{inspect(meta)}")
-      #   msg = {:join, key, meta}
-      #   # Phoenix.PubSub.direct_broadcast!(state.node_name, state.pubsub_server, topic, msg)
-      # end
-
-      # for {key, meta} <- leaves do
-      #   IO.puts("#{topic}~~presence leave: key \"#{key}\" with meta #{inspect(meta)}")
-      #   msg = {:leave, key, meta}
-      #   # Phoenix.PubSub.direct_broadcast!(state.node_name, state.pubsub_server, topic, msg)
-      # end
+      for {key, meta} <- joins do
+        IO.puts("#{sub_topic}~~presence join: key \"#{key}\" with meta #{inspect(meta)}")
+        # msg = {:join, key, meta}
+        # Phoenix.PubSub.direct_broadcast!(state.node_name, state.pubsub_server, topic, msg)
+      end
     end
 
     {:ok, state}

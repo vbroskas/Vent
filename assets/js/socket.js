@@ -6,21 +6,85 @@
 //
 // Pass the token on params as below. Or remove it
 // from the params if you are not using authentication.
-import { Socket } from "phoenix"
+import { Socket, Presence } from "phoenix"
 
 const chatSocket = new Socket("/chat_socket", { params: { token: window.userToken, user_id: window.user_id, username: window.username, role: window.role } })
 
-chatSocket.onOpen(() => console.log('chatSocket connected'))
+
 if (window.userToken) {
+
+
+	const chatChannel = chatSocket.channel(`chat:${window.roomId}`)
+	let presence = new Presence(chatChannel)
+
+
+	let chatInput = document.querySelector("#chat-input")
+	let messagesContainer = document.querySelector("#messages")
+
+
+
+
+	chatInput.addEventListener("keypress", event => {
+		if (event.key === 'Enter') {
+			chatChannel.push("new_msg", { body: chatInput.value })
+			chatInput.value = ""
+		}
+	})
+
+
+	chatChannel.on("new_msg", payload => {
+		let messageItem = document.createElement("p")
+		messageItem.innerText = `[${payload.username}] ${payload.body}`
+		messagesContainer.appendChild(messageItem)
+	})
+
+	// Presence-------------------------------
+
+	presence.onJoin((id, current, newPres) => {
+		if (!current) {
+			console.log("user has entered for the first time", newPres)
+		} else {
+			console.log("user additional presence", newPres)
+		}
+	})
+
+	presence.onLeave((id, current, leftPres) => {
+		if (current.metas.length === 0) {
+			console.log("user has left from all devices", leftPres)
+		} else {
+			console.log("user left from a device", leftPres)
+		}
+	})
+
+	function renderOnlineUsers(presence) {
+		let response = ""
+		let thing = presence.list()
+		console.log(thing)
+
+		presence.list((id, { metas: [first, ...rest] }) => {
+
+			response += `<br>${first.username}</br>`
+		})
+
+		document.querySelector("#presence").innerHTML = response
+	}
+
 	chatSocket.connect()
+	chatSocket.onOpen(() => console.log('chatSocket connected'))
+
+	presence.onSync(() => renderOnlineUsers(presence))
+
+	chatChannel.join()
+		.receive("ok", resp => { console.log("Joined Chat:", resp.room_id, "name:", resp.username) })
+		.receive("error", resp => { console.log("Unable to join  chat", resp.user_id) })
+		.receive("timeout", (resp) => console.error("chat timeout", resp.user_id))
+
+
 }
 
 
-const chatChannel = chatSocket.channel(`chat:${window.roomId}`)
-chatChannel.join()
-	.receive("ok", resp => { console.log("Joined Chat:", resp.room_id, "name:", resp.username) })
-	.receive("error", resp => { console.log("Unable to join  chat", resp.user_id) })
-	.receive("timeout", (resp) => console.error("chat timeout", resp.user_id))
+
+
 
 
 export { chatSocket as chatSocket };

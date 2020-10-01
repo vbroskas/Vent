@@ -1,3 +1,5 @@
+
+<h1>Welcome to Vent</h1>
 <%= form_for @changeset, Routes.page_path(@conn, :chat),  fn f -> %>
 <%= if @changeset.action do %>
 	<div class="alert alert-danger">

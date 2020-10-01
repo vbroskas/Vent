@@ -6,7 +6,6 @@ defmodule VentWeb.PageController do
 
   def index(conn, _params) do
     changeset = ChatFormInput.new_changeset(%ChatFormInput{})
-
     render(conn, "index.html", changeset: changeset)
   end
 
@@ -24,7 +23,7 @@ defmodule VentWeb.PageController do
               create_room_for_vent()
 
             room_id ->
-              IO.puts("VENT OPENING?? #{room_id}")
+              IO.puts("VENT OPENING: #{room_id}")
               room_id
           end
 
@@ -49,7 +48,7 @@ defmodule VentWeb.PageController do
               create_room_for_listen()
 
             room_id ->
-              IO.puts("LISTEN OPENING?? #{room_id}")
+              IO.puts("LISTEN OPENING: #{room_id}")
               room_id
           end
 

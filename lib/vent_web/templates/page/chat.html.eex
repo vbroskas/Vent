@@ -11,6 +11,10 @@ window.role = "<%= assigns[:role] %>";
 <h1>CHAT PAGE</h1>
 <h1>user id: <%=@conn.assigns.user_id %> </h1>
 <h1>room id: <%=@conn.assigns.room_id %></h1>
-<h1>auth token: <%=@conn.assigns.auth_token %></h1>
+<p>auth token: <%=@conn.assigns.auth_token %></p>
 <h1>username: <%=@conn.assigns.username %></h1>
 <h1>role: <%=@conn.assigns.role %></h1>
+
+
+<div id="messages" role="log" aria-live="polite"></div>
+<input id="chat-input" type="text"></input>

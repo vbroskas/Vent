@@ -20,11 +20,6 @@ defmodule VentWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  # def handle_info(:after_join, socket) do
-  #   {:ok, _} = ChatTracker.track(socket)
-  #   {:noreply, socket}
-  # end
-
   def handle_info(
         :after_join,
         %{channel_pid: pid, topic: topic, assigns: %{user_id: user_id, username: username}} =
@@ -48,9 +43,9 @@ defmodule VentWeb.ChatChannel do
 
   # intercept ["presence_diff"]
 
-  # def handle_out("presence_diff", msg, socket) do
-  #   IO.puts("````````````````````")
-  #   IO.inspect(msg)
-  #   {:noreply, socket}
-  # end
+  def handle_out("presence_diff", msg, socket) do
+    IO.puts("````````````````````")
+    IO.inspect(msg)
+    {:noreply, socket}
+  end
 end

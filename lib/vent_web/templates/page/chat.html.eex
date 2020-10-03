@@ -1,20 +1,37 @@
-
-
 <script>
-window.userToken = "<%= assigns[:auth_token] %>";
-window.roomId = "<%= assigns[:room_id] %>";
-window.userId = "<%= assigns[:user_id] %>";
-window.username = "<%= assigns[:username] %>";
-window.role = "<%= assigns[:role] %>";
+	window.userToken = "<%= assigns[:auth_token] %>";
+	window.roomId = "<%= assigns[:room_id] %>";
+	window.userId = "<%= assigns[:user_id] %>";
+	window.username = "<%= assigns[:username] %>";
+	window.role = "<%= assigns[:role] %>";
 </script>
 
+
+<div class="chat-cont">
+	<div class="chat-item flex-3">
+		<div id="presence">
+		</div>
+	</div>
+	<div class="chat-item flex-8">
+		<div id="messages" role="log" aria-live="polite"></div>
+		<div class="input-cont ">
+			<input class="input-item" id="chat-input" type="text"></input>
+			<button class="input-item chat-submit">submit</button>
+
+
+		</div>
+
+	</div>
+
+</div>
+
+
+
+
+<div id="pres-change"></div>
 <h1>CHAT PAGE</h1>
-<h1>user id: <%=@conn.assigns.user_id %> </h1>
-<h1>room id: <%=@conn.assigns.room_id %></h1>
+<p>user id: <%=@conn.assigns.user_id %> </p>
+<p>room id: <%=@conn.assigns.room_id %></p>
 <p>auth token: <%=@conn.assigns.auth_token %></p>
-<h1>username: <%=@conn.assigns.username %></h1>
-<h1>role: <%=@conn.assigns.role %></h1>
-
-
-<div id="messages" role="log" aria-live="polite"></div>
-<input id="chat-input" type="text"></input>
+<p>username: <%=@conn.assigns.username %></p>
+<p>role: <%=@conn.assigns.role %></p>

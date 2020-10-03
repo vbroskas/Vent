@@ -1,5 +1,5 @@
 /* This file is for your main application css. */
-@import "./phoenix.css";
+// @import "./phoenix.css";
 
 /* Alerts and form errors */
 .alert {
@@ -29,3 +29,121 @@
 .alert:empty {
   display: none;
 }
+
+.invalid-feedback{
+	color: #ea5c59;
+}
+
+body {
+	// background: #0f0f23; /*337 x 5*/
+	background: #354543;
+	color: #cccccc;
+	font-family: "Source Code Pro", monospace;
+	font-size: 14pt;
+	min-width: 60em;
+  }
+
+  .chat-cont{
+	  display: flex;
+	  flex-flow: row wrap;
+	  border: 1px solid orange;
+	//   height: 15rem;
+	  align-items: stretch;
+	  width: 80%;
+	  margin: auto;
+	  
+  }
+  .chat-item{
+	  
+	  border: 1px solid red;
+  }
+
+  .flex-8{
+	  flex: 10;
+  }
+  .flex-3{
+	  flex: 1;
+	  text-align: center;
+  }
+
+  .input-cont{
+	  display: flex;
+	  flex-flow: row wrap;
+  }
+  .input-cont > input{
+	  flex: 7;
+  }
+
+  .input-cont > button {
+	  flex: 1;
+  }
+
+  #messages{
+	overflow-y: scroll; 
+	height: 20rem;
+	padding-left: 10px;
+  }
+
+  #messages::-webkit-scrollbar {
+    width: 12px;
+}
+
+#messages::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+
+#messages::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px #99ff99; 
+}
+
+.chat-submit{
+	background: transparent;
+	color: #009900;
+	cursor: pointer;
+	border: 1px solid #145245;
+}
+.chat-submit:hover{
+	color: #99ff99;
+	border: 1px solid #99ff99;
+}
+
+  button[type="submit"] {
+	background: #00000045;
+	border: 1px solid #145245;
+	font-family: inherit;
+	font-size: inherit;
+	margin: 1rem;
+	padding: 1rem;
+	color: #009900;
+	cursor: pointer;
+  }
+  button[type="submit"]:hover, input[type="submit"]:focus {
+	color: #99ff99;
+  }
+
+  #chat-input {
+	// background: transparent;
+	color: #99ff99;
+	border: 1px solid #666666;
+	background:#a3bdb33b;
+	padding: 0 2px;
+	font-family: inherit;
+	font-size: inherit;
+	margin: 0;
+	width: 100%;
+  }
+
+  input[type="text"], textarea {
+	color: #99ff99;
+	border: 1px solid #666666;
+	background:#a3bdb33b;
+	padding: 0 2px;
+	font-family: inherit;
+	font-size: inherit;
+	margin: 0;
+  }
+  textarea {
+	vertical-align: top;
+  }

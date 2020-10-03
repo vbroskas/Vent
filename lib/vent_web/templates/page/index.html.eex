@@ -1,14 +1,16 @@
 
-<h1>Welcome to Vent</h1>
+<h1>Welcome!</h1>
+<p>Would you like to vent about something or listen and support?</p>
 <%= form_for @changeset, Routes.page_path(@conn, :chat),  fn f -> %>
 <%= if @changeset.action do %>
 	<div class="alert alert-danger">
 	Sorry, there are errors in your submission. Please correct them.
 	</div>
 <% end %>
-
- Name <%= text_input f, :name %>
+<label>
+ Name: <%= text_input f, :name %>
+ </label>
  <%= error_tag f, :name %>
-  <%= submit "Vent", name: "vent" %>
-  <%= submit "Listen", name: "listen" %>
+  <%= submit "Vent", name: "vent", type: "submit" %>
+  <%= submit "Listen", name: "listen", type: "submit" %>
 <% end %>

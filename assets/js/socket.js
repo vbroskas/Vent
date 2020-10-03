@@ -16,6 +16,7 @@ if (window.userToken) {
 
 	const chatChannel = chatSocket.channel(`chat:${window.roomId}`)
 	let presence = new Presence(chatChannel)
+	let presChange = document.querySelector("#pres-change")
 
 
 	let chatInput = document.querySelector("#chat-input")
@@ -38,32 +39,22 @@ if (window.userToken) {
 		messagesContainer.appendChild(messageItem)
 	})
 
-	// Presence-------------------------------
 
-	presence.onJoin((id, current, newPres) => {
-		if (!current) {
-			console.log("user has entered for the first time", newPres)
-		} else {
-			console.log("user additional presence", newPres)
-		}
+	chatChannel.on("presence_diff", payload => {
+		console.log("IN PREZ DIFF")
+
 	})
 
-	presence.onLeave((id, current, leftPres) => {
-		if (current.metas.length === 0) {
-			console.log("user has left from all devices", leftPres)
-		} else {
-			console.log("user left from a device", leftPres)
-		}
-	})
+
 
 	function renderOnlineUsers(presence) {
+		console.log("IN RENDER USERS")
+
 		let response = ""
-		let thing = presence.list()
-		console.log(thing)
 
 		presence.list((id, { metas: [first, ...rest] }) => {
 
-			response += `<br>${first.username}</br>`
+			response += `<br> ${first.username}</br>`
 		})
 
 		document.querySelector("#presence").innerHTML = response
@@ -73,6 +64,7 @@ if (window.userToken) {
 	chatSocket.onOpen(() => console.log('chatSocket connected'))
 
 	presence.onSync(() => renderOnlineUsers(presence))
+
 
 	chatChannel.join()
 		.receive("ok", resp => { console.log("Joined Chat:", resp.room_id, "name:", resp.username) })
@@ -91,7 +83,7 @@ export { chatSocket as chatSocket };
 
 // When you connect, you'll often need to authenticate the client.
 // For example, imagine you have an authentication plug, `MyAuth`,
-// which authenticates the session and assigns a `:current_user`.
+// which authenticates the session and assigns a `: current_user`.
 // If the current user exists you can assign the user's token in
 // the connection for use in the layout.
 //

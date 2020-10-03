@@ -28,7 +28,6 @@
 
 
 
-<div id="pres-change"></div>
 <h1>CHAT PAGE</h1>
 <p>user id: <%=@conn.assigns.user_id %> </p>
 <p>room id: <%=@conn.assigns.room_id %></p>

@@ -5,12 +5,7 @@ defmodule VentWeb.ChatTracker do
   require Logger
 
   @doc """
-  This module is mostly boilerplate that can be reused in other projects. The
-  start_link/1 function sets up default options that are then passed into
-  Phoenix.Tracker.start_link/3. The Tracker process is then started—it supervises a
-  collection of Phoenix.Tracker.Shard processes. The init/1 function is called for each
-  Shard that is created. We must provide the pubsub_server key in the init/1 function,
-  or the Tracker will crash.
+  track all clients connected to each "chat:subtopic"
   """
 
   def child_spec(opts) do
@@ -36,9 +31,7 @@ defmodule VentWeb.ChatTracker do
   end
 
   @doc """
-  Tracker requires that a handle_diff/2 function is implemented. This is where you
-  perform logic based on the changes in state. Let’s implement a handle_diff/2
-  function that prints out the changes.
+  on each leaves event make call to genserver
   """
 
   def handle_diff(diff, state) do
@@ -66,9 +59,7 @@ defmodule VentWeb.ChatTracker do
   end
 
   @doc """
-  Phoenix.Tracker.track/5 is the most important call for our Tracker. This will take
-  a pid and track it for a given topic. Any metadata can be provided here, which
-  is useful for knowing who is connected and when they joined.
+  track user_id and their role
   """
   def track(%{channel_pid: pid, topic: topic, assigns: %{user_id: user_id, role: role}}) do
     metadata = %{

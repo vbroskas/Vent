@@ -17,52 +17,99 @@ if (window.userToken) {
 	const chatChannel = chatSocket.channel(`chat:${window.roomId}`)
 	let presence = new Presence(chatChannel)
 	let presChange = document.querySelector("#pres-change")
-
-
 	let chatInput = document.querySelector("#chat-input")
+	let chatEnterBtn = document.querySelector("#enter-chat-btn")
 	let messagesContainer = document.querySelector("#messages")
+	const typingTimeout = 2000;
+	var typingTimer;
+	let userTyping = false;
 
+	chatInput.addEventListener('keydown', () => {
+		userStartsTyping()
+		clearTimeout(typingTimer);
+	})
 
-
+	chatInput.addEventListener('keyup', () => {
+		clearTimeout(typingTimer);
+		typingTimer = setTimeout(userStopsTyping, typingTimeout);
+	})
 
 	chatInput.addEventListener("keypress", event => {
+
 		if (event.key === 'Enter') {
 			chatChannel.push("new_msg", { body: chatInput.value })
 			chatInput.value = ""
 		}
 	})
 
+	chatEnterBtn.addEventListener("click", event => {
+
+
+		chatChannel.push("new_msg", { body: chatInput.value })
+		chatInput.value = ""
+
+	})
+
 
 	chatChannel.on("new_msg", payload => {
 		let messageItem = document.createElement("p")
+		messageItem.classList.add("message")
 		messageItem.innerText = `[${payload.username}] ${payload.body}`
 		messagesContainer.appendChild(messageItem)
+
+		const targetNode = document.querySelector("#messages")
+		targetNode.scrollTop = targetNode.scrollHeight
 	})
 
 
-	chatChannel.on("presence_diff", payload => {
-		console.log("IN PREZ DIFF")
+	// chatChannel.on("presence_state", state => {
+	// 	presences = Presence.syncState(presences, state)
+	// 	renderOnlineUsers(presences)
+	// })
 
-	})
+	// chatChannel.on("presence_diff", diff => {
+	// 	presences = Presence.syncDiff(presences, diff)
+	// 	renderOnlineUsers(presences)
+	// })
+
+	const userStartsTyping = function () {
+		if (userTyping) { return }
+
+		userTyping = true
+		chatChannel.push('user:typing', { typing: true })
+	}
+
+	const userStopsTyping = function () {
+		clearTimeout(typingTimer);
+		userTyping = false
+		chatChannel.push('user:typing', { typing: false })
+	}
+
+	const onlineUserTemplate = function (user) {
+		var typingIndicator = ''
+		if (user.typing) {
+			typingIndicator = 'typing'
+		}
+
+		return `<div id="online-user-${user.user_id}">
+		<strong class="${typingIndicator}">${user.username}</strong> 
+	  </div>`
+	}
 
 
 
 	function renderOnlineUsers(presence) {
 		console.log("IN RENDER USERS")
 
-		let response = ""
+		let onlineUsers = presence.list((id, { metas: [user, ...rest] }) => {
+			return onlineUserTemplate(user)
+		}).join("")
 
-		presence.list((id, { metas: [first, ...rest] }) => {
-
-			response += `<br> ${first.username}</br>`
-		})
-
-		document.querySelector("#presence").innerHTML = response
+		document.querySelector("#online-users").innerHTML = onlineUsers
 	}
 
 	chatSocket.connect()
 	chatSocket.onOpen(() => console.log('chatSocket connected'))
-
 	presence.onSync(() => renderOnlineUsers(presence))
 
 

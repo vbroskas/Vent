@@ -46,7 +46,7 @@ body {
   .chat-cont{
 	  display: flex;
 	  flex-flow: row wrap;
-	  border: 1px solid orange;
+	//   border: 1px solid orange;
 	//   height: 15rem;
 	  align-items: stretch;
 	  width: 80%;
@@ -55,7 +55,7 @@ body {
   }
   .chat-item{
 	  
-	  border: 1px solid red;
+	  border: 1px solid orange;
   }
 
   .flex-8{
@@ -100,13 +100,15 @@ body {
 
 .chat-submit{
 	background: transparent;
-	color: #009900;
+	color: orange;
 	cursor: pointer;
-	border: 1px solid #145245;
+	border: 1px solid orange;
 }
 .chat-submit:hover{
 	color: #99ff99;
 	border: 1px solid #99ff99;
+}.typing{
+	color: #99ff99;
 }
 
   button[type="submit"] {

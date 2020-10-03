@@ -20,6 +20,30 @@ defmodule VentWeb.ChatChannel do
     {:noreply, socket}
   end
 
+  @doc """
+  know when each user is typing
+  """
+  def handle_in(
+        "user:typing",
+        %{"typing" => typing},
+        %{channel_pid: pid, topic: topic, assigns: %{user_id: user_id, username: username}} =
+          socket
+      ) do
+    metadata = %{
+      online_at: DateTime.utc_now(),
+      user_id: user_id,
+      username: username,
+      typing: typing
+    }
+
+    {:ok, _} = ChatPresence.update(pid, topic, user_id, metadata)
+
+    {:reply, :ok, socket}
+  end
+
+  @doc """
+  after channel join, start pubsub tracker and phoenix presence.
+  """
   def handle_info(
         :after_join,
         %{channel_pid: pid, topic: topic, assigns: %{user_id: user_id, username: username}} =
@@ -36,7 +60,6 @@ defmodule VentWeb.ChatChannel do
     }
 
     {:ok, _} = ChatPresence.track(pid, topic, user_id, metadata)
-
     push(socket, "presence_state", ChatPresence.list(socket))
     {:noreply, socket}
   end

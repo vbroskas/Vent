@@ -9,14 +9,14 @@
 
 <div class="chat-cont">
 	<div class="chat-item flex-3">
-		<div id="presence">
+		<div id="online-users">
 		</div>
 	</div>
 	<div class="chat-item flex-8">
 		<div id="messages" role="log" aria-live="polite"></div>
 		<div class="input-cont ">
 			<input class="input-item" id="chat-input" type="text"></input>
-			<button class="input-item chat-submit">submit</button>
+			<button id="enter-chat-btn" class="input-item chat-submit">submit</button>
 
 
 		</div>

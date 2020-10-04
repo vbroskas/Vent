@@ -1,0 +1,14 @@
+<div class="change-cont">
+
+	<div class="change-item">
+		<%= button("VENT", to: Routes.page_path(@conn, :change_room, %{role: "vent"})) %>
+	</div>
+	<div class="change-item">
+		<%= button("LISTEN", to: Routes.page_path(@conn, :change_room, %{role: "listen"})) %>
+
+	</div>
+
+</div>
+
+
+<h1>CHANGE ROOM PAGE</h1>

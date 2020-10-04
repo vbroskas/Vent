@@ -43,6 +43,8 @@ body {
 	min-width: 60em;
   }
 
+//   ----chat page---------------
+
   .chat-cont{
 	  display: flex;
 	  flex-flow: row wrap;
@@ -98,6 +100,18 @@ body {
     -webkit-box-shadow: inset 0 0 6px #99ff99; 
 }
 
+#chat-input {
+	// background: transparent;
+	color: #99ff99;
+	// border: 1px solid #666666;
+	background:#a3bdb33b;
+	padding: 0 2px;
+	font-family: inherit;
+	font-size: inherit;
+	margin: 0;
+	width: 100%;
+  }
+
 .chat-submit{
 	background: transparent;
 	color: orange;
@@ -125,17 +139,7 @@ body {
 	color: #99ff99;
   }
 
-  #chat-input {
-	// background: transparent;
-	color: #99ff99;
-	border: 1px solid #666666;
-	background:#a3bdb33b;
-	padding: 0 2px;
-	font-family: inherit;
-	font-size: inherit;
-	margin: 0;
-	width: 100%;
-  }
+ 
 
   input[type="text"], textarea {
 	color: #99ff99;
@@ -149,3 +153,19 @@ body {
   textarea {
 	vertical-align: top;
   }
+
+//   -----------------change room----------------------
+.change-cont{
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	
+}
+.change-item{
+	// flex: 1;
+	// align-self: flex-start;
+	// height: 5rem;
+	width: 10rem;
+	text-align: center;
+	border: 1px solid orange;
+}

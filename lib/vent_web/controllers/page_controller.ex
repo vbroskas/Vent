@@ -9,6 +9,24 @@ defmodule VentWeb.PageController do
     render(conn, "index.html", changeset: changeset)
   end
 
+  def new_room(conn, _params) do
+    IO.puts("IN NEW ROOM")
+    # IO.inspect(params)
+    IO.inspect(get_session(conn))
+    render(conn, "change_room.html")
+  end
+
+  def change_room(conn, %{"role" => "vent"} = params) do
+    render(conn, "test.html")
+  end
+
+  # def change_room(conn, %{"role" => "listen"} = params) do
+  #   IO.puts("IN LISTEN CHANGE ROOM")
+  #   IO.inspect(params)
+  #   # IO.inspect(conn)
+
+  # end
+
   def chat(conn, %{"chat_form_input" => %{"name" => name} = form_input, "vent" => ""} = _params) do
     changeset = ChatFormInput.validate_changeset(%ChatFormInput{}, form_input)
 
@@ -69,6 +87,8 @@ defmodule VentWeb.PageController do
     |> assign(:room_id, room_id)
     |> assign(:username, name)
     |> assign(:role, role)
+    |> put_session(:user_id, fake_user_id)
+    |> put_session(:username, name)
     |> render("chat.html")
   end
 

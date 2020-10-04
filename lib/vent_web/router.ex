@@ -19,6 +19,8 @@ defmodule VentWeb.Router do
     get "/", PageController, :index
     post "/chat", PageController, :chat
     get "/chat", PageController, :chat
+    get "/new_room", PageController, :new_room
+    post "/new_room", PageController, :change_room
   end
 
   # Other scopes may use custom stacks.

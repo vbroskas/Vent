@@ -1,16 +1,21 @@
-
-<h1>Welcome!</h1>
-<p>Would you like to vent about something or listen and support?</p>
-<%= form_for @changeset, Routes.page_path(@conn, :chat),  fn f -> %>
-<%= if @changeset.action do %>
-	<div class="alert alert-danger">
-	Sorry, there are errors in your submission. Please correct them.
+<div class="chat-form-cont">
+	<div class="chat-form-item">
+		<h1>Welcome!</h1>
+		<p>Vent is an anonymous platform for strangers to vent about their problems. You also have the option of
+			listening to someone else's problems to help you forget your own.</p>
+		<%= form_for @changeset, Routes.page_path(@conn, :chat),  fn f -> %>
+		<%= if @changeset.action do %>
+		<div class="alert alert-danger">
+			Sorry, there are errors in your submission. Please correct them.
+		</div>
+		<% end %>
+		<label>
+			Name: <%= text_input f, :name %>
+		</label>
+		<%= error_tag f, :name %>
+		<%= submit "Vent", name: "vent", type: "submit" %>
+		<%= submit "Listen", name: "listen", type: "submit" %>
+		<% end %>
 	</div>
-<% end %>
-<label>
- Name: <%= text_input f, :name %>
- </label>
- <%= error_tag f, :name %>
-  <%= submit "Vent", name: "vent", type: "submit" %>
-  <%= submit "Listen", name: "listen", type: "submit" %>
-<% end %>
+
+</div>

@@ -13,28 +13,28 @@ defmodule VentWeb.PageController do
     render(conn, "change_room.html")
   end
 
+  @doc """
+  change rooms with role of vent
+  """
   def change_room(conn, %{"role" => "vent"} = _params) do
-    user_id = get_session(conn, :user_id)
-    username = get_session(conn, :username)
-
     # get current room_id from session to ensure user isn't potentially put back into same room they just left
     current_room_id = get_session(conn, :current_room_id)
     room_id = check_vent_openings(current_room_id)
-
-    process_additional_chat_request(conn, room_id, username, "vent", user_id)
+    process_additional_chat_request(conn, room_id, "vent")
   end
 
+  @doc """
+  change rooms with role of listen
+  """
   def change_room(conn, %{"role" => "listen"} = _params) do
-    user_id = get_session(conn, :user_id)
-    username = get_session(conn, :username)
-
-    # get current room_id from session to ensure user isn't potentially put back into same room they just left
     current_room_id = get_session(conn, :current_room_id)
     room_id = check_listen_openings(current_room_id)
-
-    process_additional_chat_request(conn, room_id, username, "listen", user_id)
+    process_additional_chat_request(conn, room_id, "listen")
   end
 
+  @doc """
+  Handle form POST to chat as a vent
+  """
   def chat(
         conn,
         %{"chat_form_input" => %{"name" => username} = form_input, "vent" => ""} = _params
@@ -43,10 +43,7 @@ defmodule VentWeb.PageController do
 
     case apply_action(changeset, :insert) do
       {:ok, _data} ->
-        IO.puts("HIT VENT")
-
-        # pass in empty string since this is their first connection to any room. a room id is passed to ensure that if someone tries to change
-        # rooms while keeping the same role, they won't be put back in the room they just left
+        # pass empty string since this is their first connection to any room. room_id is passed to ensure that if someone tries to change rooms while keeping the same role, they won't be put back in the room they just left
         room_id = check_vent_openings("")
         process_initial_chat_request(conn, room_id, username, "vent")
 
@@ -55,6 +52,9 @@ defmodule VentWeb.PageController do
     end
   end
 
+  @doc """
+  Handle form POST to chat as a listener
+  """
   def chat(
         conn,
         %{"chat_form_input" => %{"name" => username} = form_input, "listen" => ""} = _params
@@ -64,9 +64,6 @@ defmodule VentWeb.PageController do
     case apply_action(changeset, :insert) do
       {:ok, _data} ->
         IO.puts("HIT LISTEN")
-
-        # pass in empty string since this is their first connection to any room. a room id is passed to ensure that if someone tries to change
-        # rooms while keeping the same role, they won't be put back in the room they just left
         room_id = check_listen_openings("")
         process_initial_chat_request(conn, room_id, username, "listen")
 
@@ -78,9 +75,10 @@ defmodule VentWeb.PageController do
   def process_initial_chat_request(conn, room_id, name, role) do
     IO.puts("In process request!")
     fake_user_id = create_user_id()
+    auth_token = generate_auth_token(conn, fake_user_id)
 
     conn
-    |> assign(:auth_token, generate_auth_token(conn, fake_user_id))
+    |> assign(:auth_token, auth_token)
     |> assign(:user_id, fake_user_id)
     |> assign(:room_id, room_id)
     |> assign(:username, name)
@@ -88,18 +86,20 @@ defmodule VentWeb.PageController do
     |> put_session(:user_id, fake_user_id)
     |> put_session(:username, name)
     |> put_session(:current_room_id, room_id)
+    |> put_session(:auth_token, auth_token)
     |> render("chat.html")
   end
 
-  def process_additional_chat_request(conn, room_id, name, role, user_id) do
+  def process_additional_chat_request(conn, room_id, role) do
     IO.puts("In additional process request!")
 
     conn
-    |> assign(:auth_token, generate_auth_token(conn, user_id))
-    |> assign(:user_id, user_id)
+    |> assign(:auth_token, get_session(conn, :auth_token))
+    |> assign(:user_id, get_session(conn, :user_id))
     |> assign(:room_id, room_id)
-    |> assign(:username, name)
+    |> assign(:username, get_session(conn, :username))
     |> assign(:role, role)
+    |> put_session(:current_room_id, room_id)
     |> render("chat.html")
   end
 

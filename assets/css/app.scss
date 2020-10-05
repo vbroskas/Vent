@@ -36,14 +36,41 @@
 
 body {
 	// background: #0f0f23; /*337 x 5*/
-	background: #354543;
+	background: #2b3130;
 	color: #cccccc;
 	font-family: "Source Code Pro", monospace;
 	font-size: 14pt;
 	min-width: 60em;
   }
 
+  .header-h1{
+	text-shadow: 0 0 2px #00d2a7, 0 0 5px #00d2a7;
+  }
+
 //   ----chat page---------------
+
+.chat-options-cont{
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-end;
+	width: 80%;
+	margin: auto;
+	padding-bottom: 2rem;
+}
+
+.chat-options-item{
+
+}
+
+.change-room-btn{
+	text-decoration: none;
+	color: orange;
+}
+
+.change-room-btn:hover{
+	text-shadow: 0 0 2px orange, 0 0 5px orange;
+	color: white;
+}
 
   .chat-cont{
 	  display: flex;
@@ -57,7 +84,7 @@ body {
   }
   .chat-item{
 	  
-	  border: 1px solid orange;
+	  border: 1px solid #ad7000;
   }
 
   .flex-8{
@@ -114,9 +141,9 @@ body {
 
 .chat-submit{
 	background: transparent;
-	color: orange;
+	color: #ad7000;
 	cursor: pointer;
-	border: 1px solid orange;
+	border: 1px solid #ad7000;
 }
 .chat-submit:hover{
 	color: #99ff99;
@@ -127,12 +154,12 @@ body {
 
   button[type="submit"] {
 	background: #00000045;
-	border: 1px solid #145245;
+	border: 1px solid #3d8576;
 	font-family: inherit;
 	font-size: inherit;
 	margin: 1rem;
 	padding: 1rem;
-	color: #009900;
+	color: #4b834b;
 	cursor: pointer;
   }
   button[type="submit"]:hover, input[type="submit"]:focus {
@@ -162,10 +189,50 @@ body {
 	
 }
 .change-item{
-	// flex: 1;
-	// align-self: flex-start;
-	// height: 5rem;
+	background-color: transparent;
+	transition-timing-function: ease-in;
 	width: 10rem;
 	text-align: center;
 	border: 1px solid orange;
+	padding: 2rem;
+	-webkit-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+}
+
+.change-item:hover{
+	background-color: #ffa500d6;
+
+    -webkit-transition: background-color 1000ms linear;
+    -ms-transition: background-color 1000ms linear;
+    transition: background-color 1000ms linear;
+}
+
+.change-room{
+	text-decoration: none;
+	color: orange;
+	font-size: 2rem;
+	background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.change-room:hover{
+	text-shadow: 0 0 2px orange, 0 0 5px orange;
+	color: white;
+}
+
+// ---------chat form page---------------
+.chat-form-cont{
+	display: flex;
+	justify-content: center;
+	background-color: #232b29;
+	margin-left: auto;
+    margin-right: auto;
+    width: 60vw;
+    padding: 4rem;
+}
+
+.chat-form-item{
+
 }

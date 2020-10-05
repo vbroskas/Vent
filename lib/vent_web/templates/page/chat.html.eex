@@ -6,9 +6,20 @@
 	window.role = "<%= assigns[:role] %>";
 </script>
 
-<%= link("CHANGE ROOM", to: Routes.page_path(@conn, :new_room)) %>
+
+
+<div class="chat-options-cont">
+	<div class="chat-options-item">
+		<%= link("CHANGE ROOM", to: Routes.page_path(@conn, :new_room), class: "change-room-btn") %>
+
+	</div>
+</div>
 
 <div class="chat-cont">
+
+
+
+
 	<div class="chat-item flex-3">
 		<div id="online-users">
 		</div>
@@ -25,7 +36,6 @@
 	</div>
 
 </div>
-
 
 
 

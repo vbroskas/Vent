@@ -14,7 +14,7 @@
   <header>
       <section class="container">
         <nav role="navigation">
-          <h1> V E N T </h1>
+          <h1 class="header-h1"> V E N T </h1>
         </nav>
 
       </section>

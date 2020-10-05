@@ -18,12 +18,12 @@ defmodule Vent.ChatServer do
     GenServer.call(@name, {:left_room, room_id, role})
   end
 
-  def check_vent_openings() do
-    GenServer.call(@name, :check_vent_openings)
+  def check_vent_openings(current_room_id) do
+    GenServer.call(@name, {:check_vent_openings, current_room_id})
   end
 
-  def check_listen_openings() do
-    GenServer.call(@name, :check_listen_openings)
+  def check_listen_openings(current_room_id) do
+    GenServer.call(@name, {:check_listen_openings, current_room_id})
   end
 
   def create_room_for_vent(room_id) do
@@ -81,9 +81,9 @@ defmodule Vent.ChatServer do
   @doc """
   Find rooms with vent openings
   """
-  def handle_call(:check_vent_openings, _from, state) do
+  def handle_call({:check_vent_openings, current_room_id}, _from, state) do
     result =
-      case query_vent_openings() do
+      case query_vent_openings(current_room_id) do
         # no empty rooms found
         [] ->
           []
@@ -102,9 +102,9 @@ defmodule Vent.ChatServer do
   Find rooms with listen openings
   ets row pattern is {room_id, vent_number, listen_number, timestamp}
   """
-  def handle_call(:check_listen_openings, _from, state) do
+  def handle_call({:check_listen_openings, current_room_id}, _from, state) do
     result =
-      case query_listen_openings() do
+      case query_listen_openings(current_room_id) do
         # no empty rooms found
         [] ->
           []
@@ -142,19 +142,21 @@ defmodule Vent.ChatServer do
     {:noreply, state}
   end
 
-  defp query_vent_openings() do
+  defp query_vent_openings(current_room_id) do
     fun =
       fun do
-        {room_id, vent, listen, time} when vent == 0 -> {room_id, vent, listen, time}
+        {room_id, vent, listen, time} when vent == 0 and room_id != ^current_room_id ->
+          {room_id, vent, listen, time}
       end
 
     :ets.select(:chat_table, fun)
   end
 
-  defp query_listen_openings() do
+  defp query_listen_openings(current_room_id) do
     fun =
       fun do
-        {room_id, vent, listen, time} when listen == 0 -> {room_id, vent, listen, time}
+        {room_id, vent, listen, time} when listen == 0 and room_id != ^current_room_id ->
+          {room_id, vent, listen, time}
       end
 
     :ets.select(:chat_table, fun)

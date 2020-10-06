@@ -52,9 +52,11 @@ if (window.userToken) {
 
 
 	chatChannel.on("new_msg", payload => {
+		var today = new Date()
+		var time = today.getHours() + ":" + today.getMinutes()
 		let messageItem = document.createElement("p")
 		messageItem.classList.add("message")
-		messageItem.innerText = `[${payload.username}] ${payload.body}`
+		messageItem.innerText = `[${payload.username}: ${time}] ${payload.body}`
 		messagesContainer.appendChild(messageItem)
 
 		const targetNode = document.querySelector("#messages")

@@ -1,7 +1,8 @@
 
 
-<h1>CHANGE ROOM PAGE</h1>
+<h3 class="change-room-h3">What would you like to do?</h3>
 <div class="change-cont">
+
 
 	<div class="change-item">
 		<%= button("VENT", to: Routes.page_path(@conn, :change_room, %{role: "vent"}), class: "change-room") %>
